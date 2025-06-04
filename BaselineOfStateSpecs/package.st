@@ -1,1 +1,1 @@
-Package { #name : #BaselineOfStateSpecs }
+Package { #name : 'BaselineOfStateSpecs' }

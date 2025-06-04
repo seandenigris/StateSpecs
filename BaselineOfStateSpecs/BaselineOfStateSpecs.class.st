@@ -1,10 +1,11 @@
 Class {
-	#name : #BaselineOfStateSpecs,
-	#superclass : #BaselineOf,
-	#category : #BaselineOfStateSpecs
+	#name : 'BaselineOfStateSpecs',
+	#superclass : 'BaselineOf',
+	#category : 'BaselineOfStateSpecs',
+	#package : 'BaselineOfStateSpecs'
 }
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfStateSpecs >> baseline: spec [
 	<baseline>
 	
@@ -17,7 +18,6 @@ BaselineOfStateSpecs >> baseline: spec [
 				spec requires: #('StateSpecs-DSL-ShouldExpressions' 'StateSpecs-DSL-ClassWords')];
 			
 			package: 'StateSpecs-Specs-Tests' with: [ spec requires: 'StateSpecs-Specs' ];
-			package: 'StateSpecs-GTTools' with: [ spec requires: 'StateSpecs-Specs' ];
 			package: 'StateSpecs-DSL-ShouldExpressions-Tests' with: [ 
 				spec requires: 'StateSpecs-DSL-ShouldExpressions' ];
 			package: 'StateSpecs-DSL-ClassWords-Tests' with: [ 
@@ -25,7 +25,7 @@ BaselineOfStateSpecs >> baseline: spec [
 			
 		spec 
 			baseline: 'Ghost' with: [
-		 	    spec repository: 'github://pharo-ide/Ghost:v6.0.2'];
+		 	    spec repository: 'github://pharo-ide/Ghost:v7.0.1'];
 			project: 'GhostCore' copyFrom: 'Ghost' with: [
 		 	    spec	loads: #('ObjectGhost')];
 			project: 'GhostTests' copyFrom: 'Ghost' with: [
@@ -38,13 +38,13 @@ BaselineOfStateSpecs >> baseline: spec [
 		spec
 			group: 'default' with: #('Core' 'Tests');
 			group: 'Core' with: #('StateSpecs-Specs' 'StateSpecs-DSL-ShouldExpressions' 'StateSpecs-DSL-ClassWords');
-			group: 'Tests' with: #('StateSpecs-Specs-Tests' 'StateSpecs-DSL-ShouldExpressions-Tests' 'StateSpecs-DSL-ClassWords-Tests' 'StateSpecs-GTTools');
+			group: 'Tests' with: #('StateSpecs-Specs-Tests' 'StateSpecs-DSL-ShouldExpressions-Tests' 'StateSpecs-DSL-ClassWords-Tests');
 			group: 'GhostSupport' with: #('StateSpecs-GhostSupport');
 			group: 'GhostSupportTests' with: #('GhostSupport' 'StateSpecs-GhostSupport-Tests')
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 BaselineOfStateSpecs >> projectClass [
 	^ [ self class environment at: #MetacelloCypressBaselineProject ]
 		on: NotFound
