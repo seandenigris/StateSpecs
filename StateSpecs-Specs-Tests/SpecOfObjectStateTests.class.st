@@ -12,6 +12,32 @@ SpecOfObjectStateTests >> testAsStateSpec [
 ]
 
 { #category : #tests }
+SpecOfObjectStateTests >> testCollectionEnumerationSelect [
+
+	| spec |
+
+	spec :=
+		(SpecOfGreaterMagnitude than: 2 strong: true)
+			& (SpecOfLesserMagnitude than: 5 strong: true).
+
+	self
+		assert: (#(1 2 3 4 5) select: spec)
+		equals: #(3 4)
+]
+
+{ #category : #tests }
+SpecOfObjectStateTests >> testCollectionEnumerationXyzSatisfy [
+	| spec |
+
+	spec := SpecOfGreaterMagnitude than: 2 strong: true.
+
+	self assert: (#(1 2 3) anySatisfy: spec).
+	self deny: (#(1 2) anySatisfy: spec).
+	self assert: (#(3 4) allSatisfy: spec).
+	self deny: (#(2 3) allSatisfy: spec).
+]
+
+{ #category : #tests }
 SpecOfObjectStateTests >> testDescriptionWithTitle [
 	| stateSpec result |
 	stateSpec := SpecOfObjectState new.
@@ -71,4 +97,19 @@ SpecOfObjectStateTests >> testTitleByDefault [
 	result := stateSpec title.
 	expected := 'satisfy for ' , stateSpec class name.
 	self assert: result = expected
+]
+
+{ #category : #tests }
+SpecOfObjectStateTests >> testValueDelegatesToMatches [
+
+	| spec |
+
+	spec := SpecOfGreaterMagnitude than: 2 strong: true.
+
+	self
+		assert: (spec value: 2)
+		equals: (spec matches: 2).
+	self
+		assert: (spec value: 3)
+		equals: (spec matches: 3)
 ]

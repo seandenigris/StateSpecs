@@ -53,7 +53,9 @@ spec
 
 ## Basic
 
-Specifications can match and validate objects. In case when object does not satisfied a specification you will get failure result with detailed information about the problem.
+### Specifications can match and validate objects. 
+
+In case when object does not satisfied a specification you will get failure result with detailed information about the problem.
 For example try create SpecOfObjectClass and validate objects over it.
 
 ```Smalltalk
@@ -69,7 +71,53 @@ spec matches: 10. "==> true"
 spec matches: "string". "==> false"
 ```
 
-Specifications can be inverted by *#not* message:
+### Using specifications as predicates
+
+Every state specification implements Pharo's one-argument valuable protocol. A specification can therefore be supplied directly anywhere an API expects a one-argument predicate block.
+
+```smalltalk
+greaterThanTwo := SpecOfGreaterMagnitude
+	than: 2
+	strong: true.
+
+#(1 2 3 4) select: greaterThanTwo.
+"==> #(3 4)"
+
+#(1 2) anySatisfy: greaterThanTwo.
+"==> false"
+
+#(3 4) allSatisfy: greaterThanTwo.
+"==> true"
+```
+
+Composite specifications work the same way:
+
+```smalltalk
+singleDigitPositive :=
+	(SpecOfGreaterMagnitude than: 0 strong: true)
+		& (SpecOfLesserMagnitude than: 10 strong: true).
+
+#(-1 0 1 5 9 10 20) select: singleDigitPositive.
+"==> #(1 5 9)"
+```
+
+This makes specifications drop-in replacements for predicate blocks while retaining their identity as first-class objects. They remain inspectable, composable, reusable and capable of producing detailed validation results.
+
+Without the valuable protocol, a caller must hide the specification behind an adapter block:
+
+```smalltalk
+numbers select: [ :each | specification matches: each ]
+```
+
+The specification can now be used directly:
+
+```smalltalk
+numbers select: specification
+```
+
+`matches:` remains the semantic StateSpecs protocol. `value:` is the compatibility bridge that allows specifications to participate naturally in the wider Pharo ecosystem.
+
+### Specifications can be inverted by *#not* message:
 
 ```Smalltalk
 spec not validate: 10.  "==> a SpecOfValidationFailure(Got 10 but it should not be an instance of SmallInteger)"
@@ -78,20 +126,21 @@ spec not validate: 'some string'. "==> a SpecOfValidationSuccess"
 
 *#not* creates new spec instance. You can also invert current one with message *#invert*.
 
+### Should and Words simplify creation and validation
 
-To easily create specifications and validate objects by them StateSpecs provides two kind DSL: should expressions and "word" classes.
+To easily create specifications and validate objects with them, StateSpecs provides two DSLs: should expressions and "word" classes.
 
-First allows you to write "assertions":
+Should expressions allows you to write "assertions":
 
 ```Smalltalk
 1 should be: 2
 1 should equal: 10
 ```
 
-which create particular kind of specification and verify receiver over it.
+which creates a particular kind of specification and verifies the receiver with it.
 
 
-And second allows you to instantiate specs by natural readable words:
+Words allow you to instantiate specs by natural, readable words:
 
 ```Smalltalk
 Kind of: Number. "==> a SpecOfObjectSuperclass(should be a kind of Number)"
@@ -99,9 +148,9 @@ Instance of: String. "==> a SpecOfObjectClass(should be an instance of String)"
 Equal to: 'test'. "==> a SpecOfEquality(should equal 'test')"
 ```
 
-Word classes were introduced to get fluent interface for mock expectations (mock stub someMessage: (Kind of: String)).
+Word classes were introduced to get a fluent interface for mock expectations (mock stub someMessage: (Kind of: String)).
 
-But they are very handy shorcuts to access specifications in general. Same word can return different specifications in different expressions which allows very fluent instantiation interface:
+But they are very handy shorcuts to access specifications in general. The same word can return different specifications in different expressions, which allows a fluent instantiation interface:
 
 ```Smalltalk
 Equal to: 'test'. "==> a SpecOfEquality(should equal 'test')"
