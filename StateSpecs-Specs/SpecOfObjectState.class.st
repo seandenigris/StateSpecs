@@ -1,36 +1,39 @@
 "
-I am root of hierarchy of object state specifications.
+I am the root of the hierarchy of object state specifications.
 
-I provide two methods to check objects. One is #matches: which returns true or false. And other is #validate: which returns object validation result with detailed information about failure (if object not satisfies spec).
+I provide three methods to check objects. One is #matches:, which returns true or false. Another is #validate:, which returns an object validation result with detailed information about failures (if the object doesn't satisfy the spec). Finally, there is #value:, which lets me replace single argument testing blocks; one of the more exciting applications of this is the collection enumeration API.
 
-My subclasses should define at least #basicMatches: method to check if given object satisfied specification or not.
+My subclasses should define at least a #basicMatches: method to check if rthe given object satisfies the specification or not.
 
-I has denial variable which used to mark me as opposite specification to my original purpose. Method #matches: take it into account. And implementors of basicMatches: should not think about it. 
+I have a denial variable which is used to mark me as the opposite specification of my original purpose. The #matches: method takes it into account, but implementors of basicMatches: shouldn't worry about it. 
 
-Also subclasses can override #validate: method to retrive more specific  information about given objects. 
+Also subclasses can override the #validate: method to retrive more specific  information about given objects. 
 
 Public API and Key Messages
 
 - matches: anObject 
-it checks if anObject matches specification or not.   It returns true or false.
+Checks if anObject matches specification or not.   It returns true or false.
 
 - validate: anObject 
-it checks if anObject matches specification or not.   It returns SpecOfValidationResult instance which can be success or failure.
+Checks if anObject matches specification or not.   It returns SpecOfValidationResult instance which can be success or failure.
+
+- value: anObject
+Like #matches: (actually delegates to it), but adapts the specification to Pharo's one-argument valuable protocol. This allows specifications to be supplied directly, for example, to collection enumeration APIs such as #select:, #detect:, #anySatisfy: and #allSatisfy: without wrapping them in adapter blocks.
 
 -not
-It creates my copy with negation behaviour
+Creates my copy with negation behaviour
 
 -&
 It creates SpecOfAndConjunction instance with me and my argument
 
 -| 
-It cretes SpecOfOrDisjunction instance with me and my argument
+Creates SpecOfOrDisjunction instance with me and my argument
 
 -title:
-It sets special name of me. There is defaultTitle by default
+Sets special name of me. There is defaultTitle by default
 
 -failureDescription:
-It sets special description for validation failure
+Sets special description for validation failure
 
 
    One simple example is simply gorgeous.
@@ -179,6 +182,13 @@ SpecOfObjectState >> validate: anObject [
 SpecOfObjectState >> validationFailureFor: anObject [
 
 	^SpecOfValidationResult failed: self for: anObject 
+]
+
+{ #category : #compatibility }
+SpecOfObjectState >> value: anObject [
+	"By implementing Pharo's one-argument valuable protocol, every specification becomes a drop-in replacement for a predicate block in APIs such as #select:, #detect: and #anySatisfy:. This tiny bridge lets callers reuse the same first-class, composable and explainable specification throughout the image instead of hiding it inside an adapter block. #matches: remains my semantic protocol."
+
+	^ self matches: anObject
 ]
 
 { #category : #'specs composition' }
